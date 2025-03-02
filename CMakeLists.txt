@@ -1,32 +1,14 @@
-cmake_minimum_required(VERSION 3.10)
+  /home/runner/work/FBNeo-Android/FBNeo-Android/build_android/CMakeFiles/CMakeScratch/TryCompile-jk8Oq1/CMakeLists.txt:4 (project)
 
-# Nome do projeto
-project(FBNeo-Android)
 
-# Configuração do compilador
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Error at CMakeLists.txt:20 (add_subdirectory):
+  add_subdirectory given source "src" which is not an existing directory.
 
-# Definição da arquitetura para Android
-if(ANDROID)
-    set(CMAKE_SYSTEM_NAME Android)
-    set(CMAKE_ANDROID_NDK $ENV{ANDROID_NDK})
-    set(CMAKE_ANDROID_STL_TYPE c++_static)
-    set(CMAKE_ANDROID_ARCH_ABI armeabi-v7a)
-    set(CMAKE_ANDROID_PLATFORM android-21)
-endif()
 
-# Diretório de código-fonte
-add_subdirectory(src)
-
-# Arquivos fonte do projeto
-file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c" "src/*.h")
-
-# Criar o executável
-add_executable(fbneo ${SOURCES})
-
-# Incluir diretórios
-include_directories(${CMAKE_SOURCE_DIR}/src)
-
-# Configuração de bibliotecas externas
-target_link_libraries(fbneo)
+-- Configuring incomplete, errors occurred!
+make: *** No targets specified and no makefile found.  Stop.
+Error: Process completed with exit code 2.
