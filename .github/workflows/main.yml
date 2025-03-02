@@ -12,13 +12,14 @@ jobs:
       - name: Instalar dependências
         run: |
           sudo apt update
-          sudo apt install -y cmake ninja-build openjdk-11-jdk unzip wget git
+          sudo apt install -y cmake ninja-build openjdk-11-jdk unzip wget git gcc g++ make autoconf libtool
 
       - name: Baixar Android NDK
         run: |
           wget https://dl.google.com/android/repository/android-ndk-r23b-linux.zip
           unzip android-ndk-r23b-linux.zip
           export ANDROID_NDK=$PWD/android-ndk-r23b
+          export PATH=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
       - name: Verificar se o script de compilação existe
         run: |
@@ -26,6 +27,9 @@ jobs:
             echo "Erro: O script de compilação não foi encontrado!"
             exit 1
           fi
+
+      - name: Dar permissão ao script de compilação
+        run: chmod +x compile_fbneo_full.sh
 
       - name: Compilar FBNeo
         run: |
