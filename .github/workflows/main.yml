@@ -32,7 +32,7 @@ jobs:
           bash compile_fbneo_full.sh
 
       - name: Fazer upload do APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: fbneo-apk
           path: build_android/*.apk
