@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout código-fonte
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4  # Atualizado para versão mais recente
 
       - name: Instalar dependências
         run: |
@@ -18,14 +18,52 @@ jobs:
         run: |
           wget https://dl.google.com/android/repository/android-ndk-r23b-linux.zip
           unzip android-ndk-r23b-linux.zip
-          export ANDROID_NDK=$PWD/android-ndk-r23b
+          echo "ANDROID_NDK=$PWD/android-ndk-r23b" >> $GITHUB_ENV  # Torna variável persistente
 
       - name: Compilar FBNeo
         run: |
           bash compile_fbneo_full.sh
 
-      - name: Fazer upload do APK
-        uses: actions/upload-artifact@v2
+      - name: Compilar Flycast (Dreamcast/Naomi/Atomiswave)
+        run: |
+          cd flycast
+          mkdir build && cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21
+          make -j$(nproc)
+          cd ../..
+
+      - name: Compilar Genesis Plus GX (Mega Drive)
+        run: |
+          cd genesis_plus_gx
+          make -f Makefile.libretro
+          cd ..
+
+      - name: Compilar Snes9x (Super Nintendo)
+        run: |
+          cd snes9x
+          make -f Makefile.libretro
+          cd ..
+
+      - name: Compilar PCSX ReARMed (PlayStation 1)
+        run: |
+          cd pcsx_rearmed
+          make -f Makefile.libretro
+          cd ..
+
+      - name: Compilar MAME (Arcade/Mortal Kombat)
+        run: |
+          cd mame
+          make -f Makefile.libretro
+          cd ..
+
+      - name: Fazer upload do APK e cores
+        uses: actions/upload-artifact@v4  # Atualizado para a versão mais recente
         with:
-          name: fbneo-apk
-          path: build_android/*.apk
+          name: emuladores-android
+          path: |
+            build_android/*.apk
+            flycast/build/*.so
+            genesis_plus_gx/*.so
+            snes9x/*.so
+            pcsx_rearmed/*.so
+            mame/*.so
