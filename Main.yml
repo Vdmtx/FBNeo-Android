@@ -18,43 +18,60 @@ jobs:
         run: |
           wget https://dl.google.com/android/repository/android-ndk-r23b-linux.zip
           unzip android-ndk-r23b-linux.zip
-          echo "ANDROID_NDK=$PWD/android-ndk-r23b" >> $GITHUB_ENV  # Torna variável persistente
+          echo "ANDROID_NDK=$PWD/android-ndk-r23b" >> $GITHUB_ENV
 
       - name: Compilar FBNeo
         run: |
           bash compile_fbneo_full.sh
 
-      - name: Compilar Flycast (Dreamcast/Naomi/Atomiswave)
+      - name: Compilar Flycast (Dreamcast/Naomi/Atomiswave) sem BIOS
         run: |
           cd flycast
           mkdir build && cd build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21 -DUSE_BIOS=OFF -DSUPPORT_CHEATS=ON
           make -j$(nproc)
           cd ../..
 
-      - name: Compilar Genesis Plus GX (Mega Drive)
+      - name: Compilar Genesis Plus GX (Mega Drive) com suporte a cheats
         run: |
           cd genesis_plus_gx
-          make -f Makefile.libretro
+          make -f Makefile.libretro ENABLE_CHEATS=1
           cd ..
 
-      - name: Compilar Snes9x (Super Nintendo)
+      - name: Compilar Snes9x (Super Nintendo) com suporte a Game Genie
         run: |
           cd snes9x
-          make -f Makefile.libretro
+          make -f Makefile.libretro ENABLE_CHEATS=1
           cd ..
 
-      - name: Compilar PCSX ReARMed (PlayStation 1)
+      - name: Compilar PCSX ReARMed (PlayStation 1) com GameShark e Action Replay
         run: |
           cd pcsx_rearmed
-          make -f Makefile.libretro
+          make -f Makefile.libretro NO_BIOS=1 ENABLE_CHEATS=1 SUPPORT_COMPRESSED_ISO=ON
           cd ..
 
-      - name: Compilar MAME (Arcade/Mortal Kombat)
+      - name: Compilar MAME (Arcade/CPS3/Mortal Kombat) com suporte a trapaças
         run: |
           cd mame
-          make -f Makefile.libretro
+          make -f Makefile.libretro ENABLE_CPS3=1 ENABLE_CHD=1 ENABLE_CHEATS=1
           cd ..
+
+      - name: Criar diretórios de ROMs e Cheats automaticamente
+        run: |
+          mkdir -p ~/storage/emulated/0/Emulador/roms/
+          mkdir -p ~/storage/emulated/0/Emulador/roms/cps3/
+          mkdir -p ~/storage/emulated/0/Emulador/roms/psx/
+          mkdir -p ~/storage/emulated/0/Emulador/roms/dreamcast/
+          mkdir -p ~/storage/emulated/0/Emulador/roms/atomiswave/
+          mkdir -p ~/storage/emulated/0/Emulador/roms/naomi/
+          mkdir -p ~/storage/emulated/0/Emulador/roms/megadrive/
+          mkdir -p ~/storage/emulated/0/Emulador/roms/snes/
+          mkdir -p ~/storage/emulated/0/Emulador/cheats/ # Pasta principal para trapaças
+          mkdir -p ~/storage/emulated/0/Emulador/cheats/psx/
+          mkdir -p ~/storage/emulated/0/Emulador/cheats/snes/
+          mkdir -p ~/storage/emulated/0/Emulador/cheats/megadrive/
+          mkdir -p ~/storage/emulated/0/Emulador/cheats/arcade/
+          chmod -R 777 ~/storage/emulated/0/Emulador/
 
       - name: Fazer upload do APK e cores
         uses: actions/upload-artifact@v4  # Atualizado para a versão mais recente
